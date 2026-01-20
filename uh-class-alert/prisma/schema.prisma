@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  emailVerified Boolean        @default(false)
+  verifyToken   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+  alertLogs     AlertLog[]
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject    String   // e.g., "COSC"
+  catalogNbr String   // e.g., "4337"
+  title      String?  // e.g., "Data Science II"
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, subject, catalogNbr])
+  @@index([subject, catalogNbr])
+}
+
+model ClassCache {
+  id             String    @id @default(cuid())
+  subject        String
+  catalogNbr     String
+  courseTitle    String?
+  instructorName String?
+  isOpen         Boolean   @default(false)
+  seatsAvailable Int       @default(0)
+  enrollmentCap  Int       @default(0)
+  lastChecked    DateTime  @default(now())
+  lastOpenedAt   DateTime?
+
+  @@unique([subject, catalogNbr])
+  @@index([isOpen])
+}
+
+model AlertLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject    String
+  catalogNbr String
+  sentAt     DateTime @default(now())
+
+  @@index([userId, subject, catalogNbr, sentAt])
+}
