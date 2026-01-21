@@ -103,14 +103,14 @@ body {
 
 /* Premium card styles with enhanced glassmorphism */
 .card {
-  background: linear-gradient(135deg, rgba(17, 17, 17, 0.7) 0%, rgba(26, 26, 26, 0.6) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -204,9 +204,9 @@ body {
 
 /* Header styling */
 header {
-  backdrop-filter: blur(20px);
-  background: rgba(10, 10, 10, 0.8);
-  border-color: var(--glass-border) !important;
+  backdrop-filter: blur(25px);
+  background: rgba(10, 10, 10, 0.4) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
 }
 
 /* Scrollbar styling */

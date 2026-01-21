@@ -1,1 +1,45 @@
-[00:00:00.955] Server  LOG     ✓ Ready in 750ms
+[00:00:00.601] Server  LOG     ✓ Ready in 435ms
+[00:01:27.139] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:06.938] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:06.940] Server  ERROR   Error: ENOSPC: no space left on device, write
+[00:02:06.940] Server  ERROR   ⨯ "uncaughtException:" Error: ENOSPC: no space left on device, write
+[00:02:06.940] Server  ERROR   ⨯ "uncaughtException: " Error: ENOSPC: no space left on device, write
+[00:02:07.120] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:07.120] Server  ERROR   Error: Panic in async function
+[00:02:07.122] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:07.122] Server  ERROR   Error: Panic in async function
+[00:02:11.097] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.100] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.102] Server  ERROR   Error: Panic in async function
+[00:02:11.106] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.107] Server  ERROR   Error: Panic in async function
+[00:02:11.711] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.716] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.718] Server  ERROR   Error: Panic in async function
+[00:02:11.722] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:11.724] Server  ERROR   Error: Panic in async function
+[00:02:12.146] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.149] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.152] Server  ERROR   Error: Panic in async function
+[00:02:12.155] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.156] Server  ERROR   Error: Panic in async function
+[00:02:12.693] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.696] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.699] Server  ERROR   Error: Panic in async function
+[00:02:12.702] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:12.703] Server  ERROR   Error: Panic in async function
+[00:02:13.104] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.106] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.107] Server  ERROR   Error: Panic in async function
+[00:02:13.108] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.109] Server  ERROR   Error: Panic in async function
+[00:02:13.499] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.501] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.503] Server  ERROR   Error: Panic in async function
+[00:02:13.506] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.508] Server  ERROR   Error: Panic in async function
+[00:02:13.930] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.933] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.935] Server  ERROR   Error: Panic in async function
+[00:02:13.940] Server  ERROR   ⨯ Error: Panic in async function
+[00:02:13.942] Server  ERROR   Error: Panic in async function

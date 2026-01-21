@@ -167,7 +167,7 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen hero-gradient">
             {/* Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--background)]/50">
+            <header className="sticky top-0 z-50">
                 <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <img src="/University_of_Houston_Logo.svg.png" alt="UH" className="w-8 h-8" />

@@ -1073,13 +1073,13 @@ body {
 }
 
 .card {
-  -webkit-backdrop-filter: blur(20px);
-  background: linear-gradient(135deg, #111111b3 0%, #1a1a1a99 100%);
-  border: 1px solid #ffffff1a;
+  -webkit-backdrop-filter: blur(25px);
+  background: linear-gradient(135deg, #ffffff08 0%, #ffffff03 100%);
+  border: 1px solid #ffffff14;
   border-radius: 16px;
   padding: 28px;
   transition: all .3s cubic-bezier(.4, 0, .2, 1);
-  box-shadow: 0 8px 32px #0006, inset 0 1px #ffffff0f;
+  box-shadow: 0 8px 32px #0003, inset 0 1px #ffffff08;
 }
 
 .card:hover {
@@ -1160,10 +1160,10 @@ body {
 }
 
 header {
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  background: #0a0a0acc;
-  border-color: var(--glass-border) !important;
+  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px);
+  border-bottom: 1px solid var(--glass-border) !important;
+  background: #0a0a0a66 !important;
 }
 
 ::-webkit-scrollbar {
