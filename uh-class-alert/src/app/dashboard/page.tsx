@@ -204,7 +204,7 @@ export default function Dashboard() {
                                     type="text"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value.toUpperCase())}
-                                    placeholder="COSC"
+                                    placeholder="e.g. COSC"
                                     className="input w-full uppercase"
                                     maxLength={4}
                                     required
@@ -216,7 +216,7 @@ export default function Dashboard() {
                                     type="text"
                                     value={catalogNbr}
                                     onChange={(e) => setCatalogNbr(e.target.value)}
-                                    placeholder="4337"
+                                    placeholder="e.g. 3320"
                                     className="input w-full"
                                     maxLength={5}
                                     required
