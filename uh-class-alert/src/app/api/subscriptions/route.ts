@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     try {
         const { user } = await requireAuth();
         const body = await request.json();
-        const { subject, catalogNbr, title } = body;
+        let { subject, catalogNbr } = body;
 
         if (!subject || !catalogNbr) {
             return NextResponse.json(
@@ -70,13 +70,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if subscription already exists
+        subject = subject.toUpperCase();
+        catalogNbr = catalogNbr.toString();
+
+        // 1. Check if subscription already exists
         const existing = await prisma.subscription.findUnique({
             where: {
                 userId_subject_catalogNbr: {
                     userId: user.id,
-                    subject: subject.toUpperCase(),
-                    catalogNbr: catalogNbr.toString(),
+                    subject: subject,
+                    catalogNbr: catalogNbr,
                 },
             },
         });
@@ -96,13 +99,86 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ subscription: updated });
         }
 
-        // Create new subscription
+        // 2. Check Cache
+        let cachedClass = await prisma.classCache.findUnique({
+            where: {
+                subject_catalogNbr: {
+                    subject: subject,
+                    catalogNbr: catalogNbr,
+                },
+            },
+        });
+
+        let title = cachedClass?.courseTitle || null;
+
+        // 3. Cache Miss - Fetch Live Data
+        if (!cachedClass) {
+            console.log(`Cache miss for ${subject} ${catalogNbr}, fetching live...`);
+            const { getAllSections, CURRENT_TERM, isClassOpen, getAvailableSeats } = await import('@/lib/uh-api');
+
+            const sections = await getAllSections(CURRENT_TERM, subject, catalogNbr);
+
+            if (!sections || sections.length === 0) {
+                return NextResponse.json(
+                    { error: `Class ${subject} ${catalogNbr} not found for current term.` },
+                    { status: 404 }
+                );
+            }
+
+            // Calculate aggregate status
+            const isOpen = sections.some(s => isClassOpen(s));
+            const seatsAvailable = sections.reduce((acc, s) => acc + getAvailableSeats(s), 0);
+            title = sections[0].course_title;
+
+            // Save to ClassCache
+            cachedClass = await prisma.classCache.create({
+                data: {
+                    subject,
+                    catalogNbr,
+                    courseTitle: title,
+                    isOpen,
+                    seatsAvailable,
+                    lastChecked: new Date(),
+                },
+            });
+
+            // Save to SectionCache
+            for (const section of sections) {
+                await prisma.sectionCache.upsert({
+                    where: {
+                        classNbr: section.class_nbr || '',
+                    },
+                    update: {
+                        isOpen: isClassOpen(section),
+                        seatsAvailable: getAvailableSeats(section),
+                        enrollmentCap: section.enrl_cap,
+                        enrollmentTotal: section.enrl_tot,
+                        lastChecked: new Date(),
+                    },
+                    create: {
+                        classNbr: section.class_nbr || '',
+                        section: section.class_section || '',
+                        instructor: section.instructor_name,
+                        schedule: section.schedule_day_time || '',
+                        location: section.building_descr || '',
+                        isOpen: isClassOpen(section),
+                        seatsAvailable: getAvailableSeats(section),
+                        enrollmentCap: section.enrl_cap,
+                        enrollmentTotal: section.enrl_tot,
+                        lastChecked: new Date(),
+                        classCacheId: cachedClass.id,
+                    },
+                });
+            }
+        }
+
+        // 4. Create new subscription with verified title
         const subscription = await prisma.subscription.create({
             data: {
                 userId: user.id,
-                subject: subject.toUpperCase(),
-                catalogNbr: catalogNbr.toString(),
-                title: title || null,
+                subject: subject,
+                catalogNbr: catalogNbr,
+                title: title, // Use verified title from cache/live
             },
         });
 
@@ -113,7 +189,7 @@ export async function POST(request: NextRequest) {
         }
         console.error('Create subscription error:', error);
         return NextResponse.json(
-            { error: 'Failed to create subscription' },
+            { error: 'Failed to find or add class. Please check the info.' },
             { status: 500 }
         );
     }
