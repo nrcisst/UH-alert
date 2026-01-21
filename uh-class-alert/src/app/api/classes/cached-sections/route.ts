@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         });
 
         return NextResponse.json({
-            sections: sections.map(s => ({
+            sections: sections.map((s: typeof sections[0]) => ({
                 classNbr: s.classNbr,
                 section: s.section,
                 instructor: s.instructor,
