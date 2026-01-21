@@ -205,7 +205,7 @@ export default function Dashboard() {
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value.toUpperCase())}
                                     placeholder="e.g. COSC"
-                                    className="input w-full uppercase"
+                                    className="input w-full"
                                     maxLength={4}
                                     required
                                 />
