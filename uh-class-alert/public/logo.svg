@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="alertGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C8102E"/>
+      <stop offset="100%" stop-color="#a00d24"/>
+    </linearGradient>
+  </defs>
+  <!-- A shape that doubles as bell body -->
+  <path d="M16 2L4 26h6l1.5-4h9l1.5 4h6L16 2zm0 8l3 8h-6l3-8z" fill="url(#alertGrad)"/>
+  <!-- Bell top ring -->
+  <circle cx="16" cy="4" r="2" fill="url(#alertGrad)"/>
+  <!-- Bell rope from inside A hole down to clapper -->
+  <line x1="16" y1="18" x2="16" y2="27" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Bell clapper dot -->
+  <circle cx="16" cy="29" r="2.5" fill="url(#alertGrad)"/>
+</svg>

@@ -35,19 +35,40 @@ model Subscription {
 }
 
 model ClassCache {
-  id             String    @id @default(cuid())
+  id             String         @id @default(cuid())
   subject        String
   catalogNbr     String
   courseTitle    String?
   instructorName String?
-  isOpen         Boolean   @default(false)
-  seatsAvailable Int       @default(0)
-  enrollmentCap  Int       @default(0)
-  lastChecked    DateTime  @default(now())
+  isOpen         Boolean        @default(false)
+  seatsAvailable Int            @default(0)
+  enrollmentCap  Int            @default(0)
+  lastChecked    DateTime       @default(now())
   lastOpenedAt   DateTime?
+  sections       SectionCache[]
 
   @@unique([subject, catalogNbr])
   @@index([isOpen])
+}
+
+model SectionCache {
+  id             String     @id @default(cuid())
+  classNbr       String
+  subject        String
+  catalogNbr     String
+  section        String?
+  instructor     String?
+  schedule       String?
+  location       String?
+  isOpen         Boolean    @default(false)
+  seatsAvailable Int        @default(0)
+  enrollmentCap  Int        @default(0)
+  enrollmentTotal Int       @default(0)
+  lastChecked    DateTime   @default(now())
+  classCache     ClassCache @relation(fields: [subject, catalogNbr], references: [subject, catalogNbr], onDelete: Cascade)
+
+  @@unique([classNbr])
+  @@index([subject, catalogNbr])
 }
 
 model AlertLog {

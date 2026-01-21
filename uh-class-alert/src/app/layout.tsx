@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "UH Class Alert - Get Notified When Classes Open",
+  title: "Alert - Get Notified When Classes Open",
   description: "Receive instant email alerts when your desired UH classes have open seats. Never miss registration again.",
   keywords: ["UH", "University of Houston", "class registration", "course alerts", "class notifications"],
+  icons: {
+    icon: "/University_of_Houston_Logo.svg.png",
+  },
 };
 
 export default function RootLayout({

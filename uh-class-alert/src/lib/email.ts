@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'UH Class Alert <onboarding@resend.dev>';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Alert <onboarding@resend.dev>';
 
 interface ClassInfo {
   subject: string;
@@ -19,10 +19,10 @@ export async function sendMagicLink(email: string, token: string) {
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
-    subject: 'Sign in to UH Class Alert',
+    subject: 'Sign in to Alert',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #C8102E;">UH Class Alert</h1>
+        <h1 style="color: #C8102E;">Alert</h1>
         <p>Click the button below to sign in to your account:</p>
         <a href="${magicLink}" style="display: inline-block; background-color: #C8102E; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
           Sign In

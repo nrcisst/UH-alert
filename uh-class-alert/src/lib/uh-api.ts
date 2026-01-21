@@ -1,4 +1,4 @@
-const UH_API_URL = process.env.UH_API_URL || 'https://classbrowser.uh.edu/api/classes';
+const UH_API_URL = process.env.UH_API_URL!;
 
 export interface UHClass {
     catalog_nbr: string;
@@ -7,6 +7,11 @@ export interface UHClass {
     enrl_cap: number;
     enrl_tot: number;
     subject: string;
+    class_section?: string;
+    schedule_day_time?: string;
+    building_descr?: string;
+    enrl_stat?: string;
+    class_nbr?: string;
 }
 
 export interface ClassSearchResult {
@@ -18,15 +23,18 @@ export interface ClassSearchResult {
  * Fetch all open classes for a given subject
  */
 export async function fetchOpenClasses(term: string, subject: string): Promise<ClassSearchResult> {
-    const params = new URLSearchParams({
+    const body = new URLSearchParams({
         term,
         subject,
         classStatus: 'open',
-        weekendu: '0',
     });
 
-    const response = await fetch(`${UH_API_URL}?${params.toString()}`, {
+    const response = await fetch(UH_API_URL, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body.toString(),
     });
 
     if (!response.ok) {
@@ -44,16 +52,25 @@ export async function searchClass(
     subject: string,
     catalogNbr: string
 ): Promise<UHClass | null> {
-    const params = new URLSearchParams({
+    const body = new URLSearchParams({
         term,
         subject,
         catalogNumber: catalogNbr,
         weekendu: '0',
     });
 
-    const response = await fetch(`${UH_API_URL}?${params.toString()}`, {
+    const url = UH_API_URL;
+    console.log('Searching class:', { url, body: body.toString() });
+
+    const response = await fetch(url, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body.toString(),
     });
+
+    console.log('Response status:', response.status, response.statusText);
 
     if (!response.ok) {
         throw new Error(`UH API error: ${response.statusText}`);
@@ -62,6 +79,38 @@ export async function searchClass(
     const result: ClassSearchResult = await response.json();
 
     return result.data.find(c => c.catalog_nbr === catalogNbr) || null;
+}
+
+/**
+ * Get ALL sections for a specific class
+ */
+export async function getAllSections(
+    term: string,
+    subject: string,
+    catalogNbr: string
+): Promise<UHClass[]> {
+    const body = new URLSearchParams({
+        term,
+        subject,
+        catalogNumber: catalogNbr,
+    });
+
+    const response = await fetch(UH_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body.toString(),
+    });
+
+    if (!response.ok) {
+        throw new Error(`UH API error: ${response.statusText}`);
+    }
+
+    const result: ClassSearchResult = await response.json();
+
+    // Return all sections that match the catalog number
+    return result.data.filter(c => c.catalog_nbr === catalogNbr);
 }
 
 /**

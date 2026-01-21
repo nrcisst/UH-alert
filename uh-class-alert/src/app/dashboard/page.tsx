@@ -13,6 +13,18 @@ interface Subscription {
     lastChecked: string | null;
 }
 
+interface CachedSection {
+    classNbr: string;
+    section: string;
+    instructor: string;
+    schedule: string;
+    location: string;
+    isOpen: boolean;
+    seatsAvailable: number;
+    enrollmentCap: number;
+    enrollmentTotal: number;
+}
+
 export default function Dashboard() {
     const router = useRouter();
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -22,6 +34,9 @@ export default function Dashboard() {
     const [catalogNbr, setCatalogNbr] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [expandedClass, setExpandedClass] = useState<string | null>(null);
+    const [sectionsCache, setSectionsCache] = useState<Record<string, CachedSection[]>>({});
+    const [loadingSections, setLoadingSections] = useState(false);
 
     const fetchSubscriptions = async () => {
         try {
@@ -106,6 +121,33 @@ export default function Dashboard() {
         router.push('/');
     };
 
+    const handleToggleExpand = async (sub: Subscription) => {
+        const classKey = `${sub.subject}-${sub.catalogNbr}`;
+
+        if (expandedClass === classKey) {
+            setExpandedClass(null);
+            return;
+        }
+
+        setExpandedClass(classKey);
+
+        // Use cached data if we already have it in memory
+        if (sectionsCache[classKey]) {
+            return;
+        }
+
+        setLoadingSections(true);
+        try {
+            const res = await fetch(`/api/classes/cached-sections?subject=${sub.subject}&catalogNbr=${sub.catalogNbr}`);
+            const data = await res.json();
+            setSectionsCache(prev => ({ ...prev, [classKey]: data.sections || [] }));
+        } catch (err) {
+            console.error('Failed to fetch cached sections:', err);
+        } finally {
+            setLoadingSections(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -115,51 +157,73 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen hero-gradient">
             {/* Header */}
-            <header className="border-b border-[var(--border)] p-4">
-                <div className="max-w-4xl mx-auto flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <span className="font-bold text-xl">UH Class Alert</span>
+            <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--background)]/50">
+                <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <img src="/University_of_Houston_Logo.svg.png" alt="UH" className="w-8 h-8" />
+                        <span className="font-semibold text-lg tracking-tight">Alert</span>
                     </div>
-                    <button onClick={handleLogout} className="btn-secondary text-sm">
-                        Logout
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--glass)] border border-transparent hover:border-[var(--glass-border)] transition-all duration-200"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sign out
                     </button>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto p-6">
-                <h1 className="text-3xl font-bold mb-8">Your Watchlist</h1>
+            <main className="max-w-5xl mx-auto px-6 py-10">
+                <div className="mb-10">
+                    <h1 className="text-4xl font-bold tracking-tight mb-2">Your Watchlist</h1>
+                    <p className="text-[var(--foreground-muted)]">Add classes to track and get notified when seats open up.</p>
+                </div>
 
                 {/* Add Class Form */}
                 <div className="card mb-8">
-                    <h2 className="text-xl font-semibold mb-4">Add a Class</h2>
-                    <form onSubmit={handleAddClass} className="flex flex-col sm:flex-row gap-3">
-                        <input
-                            type="text"
-                            value={subject}
-                            onChange={(e) => setSubject(e.target.value)}
-                            placeholder="Subject (e.g., COSC)"
-                            className="input sm:w-32"
-                            maxLength={4}
-                            required
-                        />
-                        <input
-                            type="text"
-                            value={catalogNbr}
-                            onChange={(e) => setCatalogNbr(e.target.value)}
-                            placeholder="Class # (e.g., 4337)"
-                            className="input sm:w-40"
-                            maxLength={5}
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={addingClass}
-                        >
-                            {addingClass ? 'Adding...' : 'Add Class'}
-                        </button>
+                    <h2 className="text-xl font-semibold mb-6">Add a Class</h2>
+                    <form onSubmit={handleAddClass} className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1">
+                                <label className="block text-sm text-[var(--foreground-muted)] mb-2">Subject Code</label>
+                                <input
+                                    type="text"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value.toUpperCase())}
+                                    placeholder="COSC"
+                                    className="input w-full uppercase"
+                                    maxLength={4}
+                                    required
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-sm text-[var(--foreground-muted)] mb-2">Course Number</label>
+                                <input
+                                    type="text"
+                                    value={catalogNbr}
+                                    onChange={(e) => setCatalogNbr(e.target.value)}
+                                    placeholder="4337"
+                                    className="input w-full"
+                                    maxLength={5}
+                                    required
+                                />
+                            </div>
+                            <div className="sm:self-end">
+                                <button
+                                    type="submit"
+                                    className="btn-primary w-full sm:w-auto"
+                                    disabled={addingClass}
+                                >
+                                    {addingClass ? 'Adding...' : 'Add to Watchlist'}
+                                </button>
+                            </div>
+                        </div>
                     </form>
                     {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
                     {success && <p className="mt-3 text-green-400 text-sm">{success}</p>}
@@ -174,50 +238,132 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {subscriptions.map((sub) => (
-                            <div key={sub.id} className="card flex items-center justify-between animate-fade-in">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3">
-                                        <span className={`w-3 h-3 rounded-full ${sub.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                        <div>
-                                            <h3 className="font-semibold text-lg">
-                                                {sub.subject} {sub.catalogNbr}
-                                            </h3>
-                                            {sub.title && (
-                                                <p className="text-[var(--foreground-muted)] text-sm">{sub.title}</p>
-                                            )}
+                        {subscriptions.map((sub, index) => {
+                            const classKey = `${sub.subject}-${sub.catalogNbr}`;
+                            const isExpanded = expandedClass === classKey;
+
+                            return (
+                                <div
+                                    key={sub.id}
+                                    className="card animate-fade-in overflow-hidden"
+                                    style={{ animationDelay: `${index * 0.1}s` }}
+                                >
+                                    <div
+                                        className="flex items-center justify-between cursor-pointer group"
+                                        onClick={() => handleToggleExpand(sub)}
+                                    >
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-3 h-3 rounded-full ${sub.isOpen ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'}`}></div>
+                                                <div>
+                                                    <h3 className="font-semibold text-lg tracking-tight">
+                                                        {sub.subject} {sub.catalogNbr}
+                                                    </h3>
+                                                    {sub.title && (
+                                                        <p className="text-[var(--foreground-muted)] text-sm">{sub.title}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="mt-3 ml-7 text-sm flex items-center gap-3">
+                                                {sub.isOpen ? (
+                                                    <span className="text-green-400 font-medium">
+                                                        {sub.seatsAvailable} seat{sub.seatsAvailable !== 1 ? 's' : ''} available
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[var(--foreground-muted)]">Currently closed</span>
+                                                )}
+                                                <span className="text-[var(--foreground-muted)] opacity-60">
+                                                    Click to view all sections
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                className={`text-[var(--foreground-muted)] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                            >
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleRemoveClass(sub.id); }}
+                                                className="opacity-0 group-hover:opacity-100 text-[var(--foreground-muted)] hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 p-2 rounded-lg"
+                                                title="Remove from watchlist"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M3 6h18" />
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-sm text-[var(--foreground-muted)]">
-                                        {sub.isOpen ? (
-                                            <span className="status-open font-medium">
-                                                {sub.seatsAvailable} seat{sub.seatsAvailable !== 1 ? 's' : ''} available!
-                                            </span>
-                                        ) : (
-                                            <span>Currently closed</span>
-                                        )}
-                                        {sub.lastChecked && (
-                                            <span className="ml-3">
-                                                • Last checked: {new Date(sub.lastChecked).toLocaleString()}
-                                            </span>
-                                        )}
-                                    </div>
+
+                                    {/* Expanded Details - From Cache */}
+                                    {isExpanded && (
+                                        <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+                                            <div className="flex items-center gap-2 mb-3 text-xs text-[var(--foreground-muted)]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <circle cx="12" cy="12" r="10" />
+                                                    <polyline points="12 6 12 12 16 14" />
+                                                </svg>
+                                                Cached data - updated every 15 minutes
+                                            </div>
+                                            {loadingSections ? (
+                                                <div className="flex items-center justify-center py-4">
+                                                    <div className="w-5 h-5 border-2 border-[var(--uh-red)] border-t-transparent rounded-full animate-spin"></div>
+                                                </div>
+                                            ) : (sectionsCache[classKey] || []).filter(s => s.isOpen).length === 0 ? (
+                                                <p className="text-[var(--foreground-muted)] text-sm text-center py-4">
+                                                    No open sections in cache. Add the class to trigger a live fetch.
+                                                </p>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    {(sectionsCache[classKey] || []).filter(s => s.isOpen).map((section, i) => (
+                                                        <div
+                                                            key={section.classNbr || i}
+                                                            className="flex items-start justify-between p-3 rounded-lg bg-[var(--background)]/50 hover:bg-[var(--background)]/80 transition-colors"
+                                                        >
+                                                            <div className="flex-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                                                    <span className="font-medium">{section.instructor || 'TBA'}</span>
+                                                                    <span className="text-green-400 text-sm">
+                                                                        {section.seatsAvailable} open
+                                                                    </span>
+                                                                </div>
+                                                                <div className="mt-1 text-sm text-[var(--foreground-muted)] ml-4">
+                                                                    <p>Section {section.section} • {section.schedule || 'TBA'}</p>
+                                                                    <p>{section.location || 'TBA'} • {section.enrollmentTotal}/{section.enrollmentCap} enrolled</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {sub.lastChecked && (
+                                                <p className="mt-3 text-xs text-[var(--foreground-muted)] opacity-60">
+                                                    Last checked: {new Date(sub.lastChecked).toLocaleString()}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                <button
-                                    onClick={() => handleRemoveClass(sub.id)}
-                                    className="text-[var(--foreground-muted)] hover:text-red-400 transition-colors p-2"
-                                    title="Remove from watchlist"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
 
                 <div className="mt-8 p-4 rounded-lg bg-[var(--background-tertiary)] text-sm text-[var(--foreground-muted)]">
                     <p>
-                        We check for class openings every 2 hours. When a seat opens up,
+                        We check for class openings every 15 minutes. When a seat opens up,
                         you&apos;ll receive an email notification immediately.
                     </p>
                 </div>
