@@ -138,11 +138,19 @@ export default function Dashboard() {
 
         setLoadingSections(true);
         try {
-            const res = await fetch(`/api/classes/cached-sections?subject=${sub.subject}&catalogNbr=${sub.catalogNbr}`);
-            const data = await res.json();
+            // First try to get cached sections
+            let res = await fetch(`/api/classes/cached-sections?subject=${sub.subject}&catalogNbr=${sub.catalogNbr}`);
+            let data = await res.json();
+
+            // If no sections in cache, fetch live data (which will automatically populate cache)
+            if (!data.sections || data.sections.length === 0) {
+                res = await fetch(`/api/classes/sections?subject=${sub.subject}&catalogNbr=${sub.catalogNbr}`);
+                data = await res.json();
+            }
+
             setSectionsCache(prev => ({ ...prev, [classKey]: data.sections || [] }));
         } catch (err) {
-            console.error('Failed to fetch cached sections:', err);
+            console.error('Failed to fetch sections:', err);
         } finally {
             setLoadingSections(false);
         }
