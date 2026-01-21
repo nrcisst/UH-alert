@@ -157,6 +157,8 @@ export async function POST(request: NextRequest) {
                     },
                     create: {
                         classNbr: section.class_nbr || '',
+                        subject: subject,
+                        catalogNbr: catalogNbr,
                         section: section.class_section || '',
                         instructor: section.instructor_name,
                         schedule: section.schedule_day_time || '',
@@ -166,7 +168,6 @@ export async function POST(request: NextRequest) {
                         enrollmentCap: section.enrl_cap,
                         enrollmentTotal: section.enrl_tot,
                         lastChecked: new Date(),
-                        classCacheId: cachedClass.id,
                     },
                 });
             }
