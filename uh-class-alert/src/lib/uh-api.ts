@@ -59,10 +59,7 @@ export async function searchClass(
         weekendu: '0',
     });
 
-    const url = UH_API_URL;
-    console.log('Searching class:', { url, body: body.toString() });
-
-    const response = await fetch(url, {
+    const response = await fetch(UH_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -70,7 +67,6 @@ export async function searchClass(
         body: body.toString(),
     });
 
-    console.log('Response status:', response.status, response.statusText);
 
     if (!response.ok) {
         throw new Error(`UH API error: ${response.statusText}`);

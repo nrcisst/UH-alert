@@ -152,7 +152,13 @@ export default function Home() {
             <div className="card cursor-pointer hover:-translate-y-2 hover:shadow-2xl hover:shadow-[var(--uh-red)]/10 transition-all duration-300">
               <h3 className="font-semibold text-lg mb-2">How often do you check for openings?</h3>
               <p className="text-[var(--foreground-muted)]">
-                We check every 2 hours around the clock. When a class opens up, you&apos;ll get an email within minutes.
+                We check every 15 minutes around the clock. When a class opens up, you&apos;ll get an email immediately.
+              </p>
+            </div>
+            <div className="card cursor-pointer hover:-translate-y-2 hover:shadow-2xl hover:shadow-[var(--uh-red)]/10 transition-all duration-300">
+              <h3 className="font-semibold text-lg mb-2">Which semester does this track?</h3>
+              <p className="text-[var(--foreground-muted)]">
+                We track the current registration semester. The system is updated at the start of each registration period (Spring, Summer, Fall).
               </p>
             </div>
             <div className="card cursor-pointer hover:-translate-y-2 hover:shadow-2xl hover:shadow-[var(--uh-red)]/10 transition-all duration-300">
@@ -165,6 +171,12 @@ export default function Home() {
               <h3 className="font-semibold text-lg mb-2">How many classes can I watch?</h3>
               <p className="text-[var(--foreground-muted)]">
                 You can add as many classes as you want. There&apos;s no limit!
+              </p>
+            </div>
+            <div className="card cursor-pointer hover:-translate-y-2 hover:shadow-2xl hover:shadow-[var(--uh-red)]/10 transition-all duration-300">
+              <h3 className="font-semibold text-lg mb-2">How do I stop receiving alerts?</h3>
+              <p className="text-[var(--foreground-muted)]">
+                You can remove individual classes from your dashboard, or click the unsubscribe link in any alert email to stop all notifications.
               </p>
             </div>
           </div>
