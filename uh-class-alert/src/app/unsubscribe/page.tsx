@@ -8,10 +8,37 @@ function UnsubscribeContent() {
     const searchParams = useSearchParams();
     const email = searchParams.get('email');
     const [unsubscribed, setUnsubscribed] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleUnsubscribe = async () => {
-        // For now, just show a message. In production, you'd call an API
-        setUnsubscribed(true);
+        if (!email) {
+            setError('No email provided');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('/api/auth/unsubscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setUnsubscribed(true);
+            } else {
+                setError(data.error || 'Failed to unsubscribe');
+            }
+        } catch {
+            setError('Failed to unsubscribe. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (unsubscribed) {
@@ -41,10 +68,17 @@ function UnsubscribeContent() {
                     <Link href="/" className="btn-secondary">
                         Cancel
                     </Link>
-                    <button onClick={handleUnsubscribe} className="btn-primary">
-                        Unsubscribe
+                    <button
+                        onClick={handleUnsubscribe}
+                        className="btn-primary"
+                        disabled={loading}
+                    >
+                        {loading ? 'Unsubscribing...' : 'Unsubscribe'}
                     </button>
                 </div>
+                {error && (
+                    <p className="mt-4 text-red-400 text-sm">{error}</p>
+                )}
             </div>
         </div>
     );

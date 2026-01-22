@@ -127,8 +127,9 @@ export function isClassOpen(classData: UHClass): boolean {
     return getAvailableSeats(classData) > 0;
 }
 
-// Current term code - update this each semester
-export const CURRENT_TERM = '2280'; // Spring 2028
+// Current term code - configurable via environment variable
+// Default: 2280 (Spring 2028) - Update UH_CURRENT_TERM env var each semester
+export const CURRENT_TERM = process.env.UH_CURRENT_TERM || '2280';
 
 // Common UH subjects
 export const UH_SUBJECTS = [
