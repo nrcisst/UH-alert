@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Receive instant email alerts when your desired UH classes have open seats. Never miss registration again.",
   keywords: ["UH", "University of Houston", "class registration", "course alerts", "class notifications"],
   icons: {
-    icon: "/University_of_Houston_Logo.svg.png",
+    icon: "/favicon.png",
   },
 };
 
